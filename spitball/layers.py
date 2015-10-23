@@ -5,10 +5,10 @@ from sklearn.cross_validation import KFold
 from sklearn.pipeline import make_union
 
 
-class Layer:
+class Layer(object):
 
-    def __init__(self, models=[]):#, X, y, metric, val_split=.8):
-        self.models = models
+    def __init__(self):#, X, y, metric, val_split=.8):
+        self.models = []
 
     # todo cast estimators to models
     def add(self, model):

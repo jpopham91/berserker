@@ -8,7 +8,7 @@ class Ensemble(object):
     contains N layers, where layers 0..N-1 are collections of models and transformations
     and the Nth layer is a single (meta)estimator for making final predictions
     """
-    def __init__(self, X, y, metric, validation_split=0.2, layers=[]):
+    def __init__(self, X, y, metric, validation_split=0.2):
         cutoff = int(len(X)*validation_split)
         self.X_trn = X[:-cutoff]
         self.y_trn = y[:-cutoff]
@@ -18,7 +18,7 @@ class Ensemble(object):
         self.y_val = y[-cutoff:]
 
         self.metric = metric
-        self.layers = layers
+        self.layers = []
         self.pipe = None
 
     # todo: add handling for single node layer (i.e. final meta-estimator)
@@ -26,14 +26,13 @@ class Ensemble(object):
         self.layers.append(layer)
 
     def predict(self, X):
-        if not self.pipe:
-            steps = list([layer.make_union() for layer in self.layers])
-            self.pipe = make_pipeline(*steps)
-            self.pipe.fit(self.X_trn, self.y_trn)
+        steps = [layer.make_union() for layer in self.layers]
+        self.pipe = make_pipeline(*steps)
+        self.pipe.fit(self.X_trn, self.y_trn)
         return self.pipe.predict(X)
 
     def score(self, X, y):
-        return self.metric(self.predict(X), y)
+        return self.metric(self.pipe.predict(X), y)
 
     # todo: some of the string formatting here is ugly and may need to get factored out
     def report(self, sort=False):

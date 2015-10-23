@@ -2,7 +2,7 @@
 #from abc import ABCMeta, abstractmethod
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from typing import Callable
+#from typing import Callable
 
 # todo: find elegant way of enabling typing for pre python 3.5 setups
 #from mypy.types import CallableType as Callable
@@ -16,8 +16,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 class Model(TransformerMixin, BaseEstimator):
 
     def __init__(self, estimator,
-                 target_transform: Callable[[float], float]=(lambda x: x),
-                 inverse_transform: Callable[[float], float]=(lambda x: x)):
+                 target_transform=(lambda x: x),
+                 inverse_transform=(lambda x: x)):
         """
         :param estimator: classifier or regressor compatible with the scikit-learn api
         :type estimator: sklearn estimator
@@ -34,7 +34,6 @@ class Model(TransformerMixin, BaseEstimator):
 
     # todo: add support for bagging and folds
     def fit(self, X: np.ndarray, y: np.array):
-        print("Fitting {}".format(str(self.estimator)))
         self.estimator.fit(X, self.target_transform(y))
         return self
 
@@ -42,8 +41,9 @@ class Model(TransformerMixin, BaseEstimator):
         pred = self.estimator.predict(X)
         return self.inverse_transform(pred)
 
-    def transform(self, X, *args, **kwargs):
-        return self.predict(X, *args, **kwargs).reshape(-1,1)
+    def transform(self, X, y=None):
+        transformed = self.predict(X).reshape(-1,1)
+        return transformed
 
     def score(self, X, y, metric):
         return metric(y, self.predict(X))
