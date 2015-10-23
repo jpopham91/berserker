@@ -1,10 +1,13 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
+from fn import _
 
-__author__ = 'jake'
-
-
-class Ensemble:
+class Ensemble(object):
+    """
+    vanilla ensemble object
+    contains N layers, where layers 0..N-1 are collections of models and transformations
+    and the Nth layer is a single (meta)estimator for making final predictions
+    """
     def __init__(self, X, y, metric, validation_split=0.2, layers=[]):
         cutoff = int(len(X)*validation_split)
         self.X_trn = X[:-cutoff]
@@ -32,10 +35,21 @@ class Ensemble:
     def score(self, X, y):
         return self.metric(self.predict(X), y)
 
-    # todo: allow models to be named to improve readability
-    def report(self):
-        print('Base Model Validation Scores:')
+    # todo: some of the string formatting here is ugly and may need to get factored out
+    def report(self, sort=False):
+        val_scores = []
         for model in self.layers[0].models:
-            print('{:.4f}'.format(model.score(self.X_val, self.y_val, self.metric)))
-        print('Meta Estimator Validation Score:')
-        print('{:.4f}'.format(self.score(self.X_val, self.y_val)))
+            if hasattr(model, 'estimator'):
+                val_scores.append((str(model.estimator).split('(')[0],
+                                   model.score(self.X_val, self.y_val, self.metric)))
+
+        if sort: val_scores = sorted(val_scores, key=lambda x: x[1])
+        width = max(map(lambda x: len(x[0]), val_scores)) + 2
+        print('\nBase Model Validation Scores:')
+        for score in val_scores:
+            print('  {: <{w}}{:.4f}'.format(*score, w=width))
+
+        print('\nFull Ensemble Scores:')
+        print('  {: <{w}}{:.4f}'.format('Training', self.score(self.X_trn, self.y_trn), w=width))
+        print('\033[1m  {: <{w}}{:.4f}\033[0m'.format('Validation', self.score(self.X_val, self.y_val), w=width))
+
