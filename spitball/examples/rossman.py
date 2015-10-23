@@ -1,4 +1,6 @@
-from .layers import Layer
+from spitball.layers import Layer
+from spitball.ensemble import Ensemble
+from spitball.models import Model
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
@@ -45,40 +47,40 @@ assert X.shape[1] == X_tst.shape[1]
 def rmspe(y_true, y_pred):
     return np.sqrt(np.mean(np.square((y_true-y_pred)/y_true)))
 
-est = xgb.XGBRegressor(n_estimators=50, max_depth=10, learning_rate=0.25,
-                              subsample=0.9, colsample_bytree=0.8)
+ensemble = Ensemble(X, y, rmspe)
 
-est.fit(X, y)
-y_pred = est.predict(X)
+print("building base layer")
 
-train['pred'] = y_pred
+base = Layer()
 
-train.to_csv('/home/jake/Downloads/rossman/train_preds.csv', index=False)
+base.add(Model(Lasso()))
+base.add(Model(ElasticNet()))
+base.add(Model(Ridge()))
 
-ensemble = Layer(X, y, rmspe, .8)
+ensemble.add(base)
+ensemble.add(Layer([LinearRegression()]))
 
-print("building ensemble")
-
-ensemble.add(Lasso())
-ensemble.add(ElasticNet())
-ensemble.add(Ridge())
 #ensemble.add(SVR(kernel='linear'))
-ensemble.add(xgb.XGBRegressor(n_estimators=10, max_depth=10, learning_rate=0.25,
-                              subsample=0.9, colsample_bytree=0.8))
-ensemble.add(RandomForestRegressor(n_estimators=10, n_jobs=-1))
+#ensemble.add(xgb.XGBRegressor(n_estimators=10, max_depth=10, learning_rate=0.25,
+#                              subsample=0.9, colsample_bytree=0.8))
+#ensemble.add(RandomForestRegressor(n_estimators=10, n_jobs=-1))
 #ensemble.add(ExtraTreesRegressor(n_estimators=50, n_jobs=-1))
 
 
-ensemble.fit_predict(X_tst, 4)
+preds = ensemble.predict(X_tst)
+print(preds)
+print(base.models[0].score(X,y, rmspe))
+print(ensemble.report())
 
-print('\nBlending with meta-estimator')
-preds = ensemble.blend(LinearRegression())
-pd.DataFrame({'Id' : ids, 'Sales' : preds}).to_csv('/home/jake/Downloads/rossman/blend.csv', index=False)
 
-print('\nAveraging predictions with stepwise regression')
-preds = ensemble.stepwise_regression()
-pd.DataFrame({'Id' : ids, 'Sales' : preds}).to_csv('/home/jake/Downloads/rossman/stepwise.csv', index=False)
-
-print('\nAveraging predictions with stepwise regression')
-preds = ensemble.stepwise_regression()
-pd.DataFrame({'Id' : ids, 'Sales' : preds}).to_csv('/home/jake/Downloads/rossman/stepwise.csv', index=False)
+# print('\nBlending with meta-estimator')
+# preds = ensemble.blend(LinearRegression())
+# pd.DataFrame({'Id' : ids, 'Sales' : preds}).to_csv('/home/jake/Downloads/rossman/blend.csv', index=False)
+#
+# print('\nAveraging predictions with stepwise regression')
+# preds = ensemble.stepwise_regression()
+# pd.DataFrame({'Id' : ids, 'Sales' : preds}).to_csv('/home/jake/Downloads/rossman/stepwise.csv', index=False)
+#
+# print('\nAveraging predictions with stepwise regression')
+# preds = ensemble.stepwise_regression()
+# pd.DataFrame({'Id' : ids, 'Sales' : preds}).to_csv('/home/jake/Downloads/rossman/stepwise.csv', index=False)

@@ -6,4 +6,5 @@ temp/*
 dist/*
 build/*
 spitball/datasets/*
+spitball/examples/*
 

@@ -22,3 +22,48 @@ class RandomForest:
             score_hist.append(round_score)
             print('{:4d} {:.4f}'.format(self.clf.n_estimators, round_score))
             self.clf.n_estimators += step_size
+
+    # todo: make this a class
+    def stepwise_regression(self):
+
+        #self.fit_predict(X_tst)
+
+        pred_list = self.val_preds[:]
+
+        # blend
+        selection = []
+        best_indices = []
+        score_list = []
+
+        while score_list == sorted(score_list, reverse=True):
+            best_score = 100
+            best_pred = None
+            best_index = 0
+            for i, pred in enumerate(pred_list):
+                candidate = list(selection)
+                candidate.append(pred)
+                this_avg = sum(candidate) / len(candidate)
+
+                this_score = self.cost(self.y_val, this_avg)
+                #print('Candidate score: {:.4f}'.format(this_score))
+
+                if this_score < best_score:
+                    best_score = this_score
+                    best_pred = pred
+                    best_index = i
+
+            score_list.append(best_score)
+            selection.append(best_pred)
+            pred_list.pop(best_index)
+            best_indices.append(best_index)
+
+        selection.pop()
+        blended_preds = sum(selection) / len(selection)
+
+        # print("\nMean Estimator Scores:")
+        # for score_list in self.scores:
+        #     print('{:.4f}'.format(np.mean(score_list)))
+
+        print('\033[1m' + 'Ensemble Score:' + '{:.4f}\033[0m'.format(self.cost(self.y_val, blended_preds)))
+
+        return sum(list(np.array(self.tst_preds)[best_indices])) / len(list(np.array(self.tst_preds)[best_indices]))
