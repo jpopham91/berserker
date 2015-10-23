@@ -6,5 +6,5 @@ temp/*
 dist/*
 build/*
 spitball/datasets/*
-spitball/examples/*
+spitball/examples/_*
 .idea/*

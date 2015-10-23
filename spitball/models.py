@@ -34,7 +34,7 @@ class Model(TransformerMixin, BaseEstimator):
 
     # todo: add support for bagging and folds
     def fit(self, X: np.ndarray, y: np.array):
-        self.estimator.fit(X, y)
+        self.estimator.fit(X, self.target_transform(y))
         return self
 
     def predict(self, X: np.ndarray, y: np.array=None):
