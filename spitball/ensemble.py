@@ -41,15 +41,14 @@ class Ensemble(object):
         for model in self.layers[0].models:
             if hasattr(model, 'estimator'):
                 val_scores.append((str(model.estimator).split('(')[0],
+                                   model.score(self.X_trn, self.y_trn, self.metric),
                                    model.score(self.X_val, self.y_val, self.metric)))
 
-        if sort: val_scores = sorted(val_scores, key=lambda x: x[1])
-        width = max(map(lambda x: len(x[0]), val_scores)) + 2
-        print('\nBase Model Validation Scores:')
+        if sort: val_scores = sorted(val_scores, key=lambda x: x[2])
+        width = max(map(lambda x: len(x[0]), val_scores))
+        print('\n{: <{w}}  {: <6}  {: <6}'.format('Model', 'Train', 'Val', w=width))
+        print('-'*(width+16))
         for score in val_scores:
-            print('  {: <{w}}{:.4f}'.format(*score, w=width))
-
-        print('\nFull Ensemble Scores:')
-        print('  {: <{w}}{:.4f}'.format('Training', self.score(self.X_trn, self.y_trn), w=width))
-        print('\033[1m  {: <{w}}{:.4f}\033[0m'.format('Validation', self.score(self.X_val, self.y_val), w=width))
+            print('{: <{w}}  {:.4f}  {:.4f}'.format(*score, w=width))
+        print('\033[1m{: <{w}}  {:.4f}  {:.4f}\033[0m'.format('Full Ensemble', self.score(self.X_trn, self.y_trn), self.score(self.X_val, self.y_val), w=width))
 
