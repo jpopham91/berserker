@@ -1,0 +1,9 @@
+*.pyc
+*.swp
+*.csv
+*.tsv
+temp/*
+dist/*
+build/*
+spitball/datasets/*
+
