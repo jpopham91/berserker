@@ -22,7 +22,7 @@ Spitball is a python module used for streamlining the creation of complex machin
 ###Incredibly simple regression model blending:
 ```python
 from spitball.ensemble import Blender
-from spitball.models import Model, Via
+from spitball.models import Node, Via
 
 blender = Blender(X, y, mean_squared_error)
 
@@ -30,9 +30,9 @@ estimators = [Ridge, ElasticNet, Lasso, LinearRegression, SVR, KNeighborsRegress
               XGBRegressor, RandomForestRegressor]
               
 for estimator in estimators:
-    blender.add(Model(estimator()))
+    blender.add(Node(estimator()))
 
-blender.add(Via())
+blender.add(Node())
 
 preds = blender.predict(X_tst)
 ```
