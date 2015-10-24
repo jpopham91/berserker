@@ -82,11 +82,13 @@ class Blender(object):
         self.X_trn = X[:-cutoff]
         self.y_trn = y[:-cutoff]
         self.trn_preds = []
+        self.trn_score = None
 
         # todo: look into how keras deals with the existence of validation data
         self.X_val = X[-cutoff:]
         self.y_val = y[-cutoff:]
         self.val_preds = []
+        self.val_score = None
 
         self.is_fit = False
         self.meta_estimator = meta_estimator
@@ -112,7 +114,6 @@ class Blender(object):
         self.is_fit = True
 
     def predict(self, X):
-
         if not self.is_fit:
             self._fit()
 
@@ -126,6 +127,7 @@ class Blender(object):
         return self.metric(self.predict(X), y)
 
     # todo: some of the string formatting here is ugly and may need to get factored out
+    # maybe break into get_scores and report?
     def report(self, sort=False):
         val_scores = []
         for model in self.base_models.models:
@@ -134,10 +136,14 @@ class Blender(object):
                                    model.score(self.X_trn, self.y_trn, self.metric),
                                    model.score(self.X_val, self.y_val, self.metric)))
 
+        self.trn_score = self.score(self.X_trn, self.y_trn)
+        self.val_score = self.score(self.X_val, self.y_val)
+
         if sort: val_scores = sorted(val_scores, key=lambda x: x[2])
         width = max(map(lambda x: len(x[0]), val_scores))
+
         print('\n{: <{w}}  {: <6}  {: <6}'.format('Model', 'Train', 'Val', w=width))
         print('-'*(width+16))
         for score in val_scores:
             print('{: <{w}}  {:.4f}  {:.4f}'.format(*score, w=width))
-        print('\033[1m{: <{w}}  {:.4f}  {:.4f}\033[0m'.format('Blend Ensemble', self.score(self.X_trn, self.y_trn), self.score(self.X_val, self.y_val), w=width))
+        print('\033[1m{: <{w}}  {:.4f}  {:.4f}\033[0m'.format('Blend Ensemble', self.trn_score, self.val_score, w=width))

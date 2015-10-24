@@ -4,7 +4,12 @@ import numpy as np
 from sklearn.cross_validation import KFold
 from sklearn.pipeline import make_union
 
-
+# todo: maybe let stacking vs blending be determined at the layer level?
+# then the model can just fit predict each layer and feed the results onward
+# the blend only passes forth the validation holdout
+# stacks pass everything
+# most of the work being done in ensemble could be done here
+# print a report of estimator performace AT EACH LEVEL
 class Layer(object):
 
     def __init__(self):#, X, y, metric, val_split=.8):
@@ -14,6 +19,10 @@ class Layer(object):
     def add(self, model):
         """appends a model to the current layer"""
         self.models.append(model)
+
+    def fit_all(self, X, y):
+        for model in self.models:
+            model.fit(X, y)
 
     def make_union(self):
         """creates a sklean.FeatureUnion object from the models in this layer"""
