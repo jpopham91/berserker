@@ -130,7 +130,7 @@ class Blender(object):
         val_scores = []
         for model in self.base_models.models:
             if hasattr(model, 'estimator'):
-                val_scores.append((str(model.estimator).split('(')[0],
+                val_scores.append((model.name,
                                    model.score(self.X_trn, self.y_trn, self.metric),
                                    model.score(self.X_val, self.y_val, self.metric)))
 

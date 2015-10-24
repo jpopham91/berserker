@@ -13,9 +13,9 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # not an sklearn estimator, but a transformer
 # todo: maybe abstract as a 'node' or 'element' class
 
-class Model(TransformerMixin, BaseEstimator):
+class Node(TransformerMixin, BaseEstimator):
 
-    def __init__(self, estimator,
+    def __init__(self, estimator, name=None,
                  target_transform=(lambda x: x),
                  inverse_transform=(lambda x: x)):
         """
@@ -27,6 +27,10 @@ class Model(TransformerMixin, BaseEstimator):
         :type inverse_transform: (np.array -> np.array)
         :return:
         """
+
+        self.name = '{}'.format(str(estimator).split('(')[0])
+        if name:
+            self.name += ' {}'.format(name)
         self.estimator = estimator
         self.target_transform = np.vectorize(target_transform)
         self.inverse_transform = np.vectorize(inverse_transform)
@@ -34,7 +38,7 @@ class Model(TransformerMixin, BaseEstimator):
 
     # todo: add support for bagging and folds
     def fit(self, X: np.ndarray, y: np.array):
-        print('Training {}...'.format(str(self.estimator).split('(')[0]))
+        print('Training {}...'.format(self.name))
         self.estimator.fit(X, self.target_transform(y))
         return self
 
@@ -51,7 +55,7 @@ class Model(TransformerMixin, BaseEstimator):
 
 
 # todo: might change the via to an estimator
-class Via(Model):
+class Via(Node):
     """A node which passes feature vectors through to the next layer unaltered"""
 
     def __init__(self):
