@@ -67,14 +67,12 @@ class Node(TransformerMixin, BaseEstimator):
 
     def fit(self, X: np.ndarray, y: np.array):
         print('[{}] Training {}...'.format(arrow.utcnow().to('EST').format('HH:mm:ss'), self.name))
-        print(X.shape, y.shape)
         self.estimator.fit(X, self.target_transform(y))
         self.is_fit = True
         return self
 
     def predict(self, X: np.ndarray, y: np.array=None):
         print('[{}] Predicting {}...'.format(arrow.utcnow().to('EST').format('HH:mm:ss'), self.name))
-        print(X.shape)
         pred = self.estimator.predict(X)
         return self.inverse_transform(pred)
 

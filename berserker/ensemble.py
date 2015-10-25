@@ -12,12 +12,12 @@ class Ensemble(object):
     """
     def __init__(self, X, y, metric, validation_split=0.2):
         cutoff = int(len(X)*validation_split)
-        self.X_trn = X[:-cutoff]
-        self.y_trn = y[:-cutoff]
+        self.X_trn = X#[:-cutoff]
+        self.y_trn = y#[:-cutoff]
 
         # todo: look into how keras deals with the existence of validation data
-        self.X_val = X[-cutoff:]
-        self.y_val = y[-cutoff:]
+        #self.X_val = X[-cutoff:]
+        #self.y_val = y[-cutoff:]
 
         self.metric = metric
         self.layers = [Layer(self.X_trn, self.y_trn)]
@@ -29,19 +29,26 @@ class Ensemble(object):
         self.layers.append(Layer(self.X_trn, self.y_trn, **kwargs))
 
     def predict(self, X):
-        preds = self.layers[0].transform(X)
-        val_preds = self.layers[0].transform(self.X_val)
+        preds, val_preds = self.layers[0].transform(X)
+        #print(preds.shape, val_preds.shape)
         if len(self.layers) == 0:
             return preds
         for layer in self.layers[1:]:
-            layer.X_trn = val_preds
-            layer.y_trn = self.y_val
-            print(val_preds.shape, self.y_val.shape)
-            preds = layer.transform(preds)
+            layer.X_trn = layer.X_val = val_preds
+            #print(layer.X_trn.shape)
+            #layer.y_trn = self.y_val
+            preds, val_preds = layer.transform(preds)
+            #print(preds.shape, val_preds.shape)
         return preds
 
-    def score(self, X, y):
-        return self.metric(self.pipe.predict(X), y)
+    def scores(self):
+        for n, layer in enumerate(self.layers):
+            #print('\nLayer', n+1)
+            print('{: <24}  {: <6}'.format('\nLevel {:d} Estimators'.format(n+1),  'Val Score'))
+            print('-'*35)
+            for node, pred in zip(layer.nodes, layer.val_preds):
+                print('{: <24}  {:.4f}'.format(node.name, self.metric(layer.y_val, pred)))
+                #print(node.name, self.metric(layer.y_val, pred))
 
     # todo: some of the string formatting here is ugly and may need to get factored out
     def report(self, sort=False):

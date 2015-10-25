@@ -13,6 +13,8 @@ test_split = int(0.2*n_samples)
 np.random.seed(42)
 shuffled_data = data#[np.random.permutation(n_samples)]
 
+print(data)
+
 train = shuffled_data[:-test_split]
 test = shuffled_data[test_split:]
 
@@ -26,12 +28,14 @@ model = Ensemble(X_trn, y_trn, mean_squared_error)
 
 model.add_node(LinearRegression())
 model.add_node(RandomForestRegressor())
+model.add_node(RandomForestRegressor(50))
 model.add_node(ExtraTreesRegressor())
 
-model.add_layer()
+model.add_layer(folds=1)
 model.add_node(LinearRegression())
 
 preds = model.predict(X_trn)
+model.scores()
 print(mean_squared_error(y_tst, preds))
 
 
