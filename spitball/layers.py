@@ -1,8 +1,12 @@
+import hashlib
+
 __author__ = 'jake'
 
+from spitball import PREDICTIONS_DIR
 import numpy as np
 from sklearn.cross_validation import KFold
 from sklearn.pipeline import make_union
+from glob import glob
 
 # todo: maybe let stacking vs blending be determined at the layer level?
 # then the model can just fit predict each layer and feed the results onward
@@ -12,17 +16,73 @@ from sklearn.pipeline import make_union
 # print a report of estimator performace AT EACH LEVEL
 class Layer(object):
 
-    def __init__(self):#, X, y, metric, val_split=.8):
-        self.models = []
+    def __init__(self, X, y, validation_split=0.2, validation_set=None):
+        cutoff = int(len(X)*validation_split)
+
+        self.X_trn = X[:-cutoff]
+        self.y_trn = y[:-cutoff]
+        self.nodes = []
+
+    @staticmethod
+    def _generate_hash(model, X_trn, X_prd):
+        """
+        Generates the md5 hash for a given model, trained on X_trn, predicting X_prd.
+        Predictions can be stored using this hash in the filename,
+        so that repeat fitting, predictions can be avoided an improve speed.
+        """
+        md5 = hashlib.md5()
+        model_hash = str(hash(model)).encode('ascii')
+        md5.update(model_hash)
+        md5.update(X_trn.data.tobytes())
+        md5.update(X_prd.data.tobytes())
+        return md5.hexdigest()
 
     # todo cast estimators to models
     def add(self, model):
-        """appends a model to the current layer"""
-        self.models.append(model)
+        """appends a node to the current layer"""
+        self.nodes.append(model)
 
-    def fit_all(self, X, y):
-        for model in self.models:
-            model.fit(X, y)
+    def _fit_one(self, node, force=False):
+        """
+        fits a single node if not already fit
+        :param node:
+        :param force:
+        :return:
+        """
+        if not node.is_fit or force:
+            node.fit(self.X_trn, self.y_trn)
+
+    def _predict_one(self, node, X):
+        """
+        obtains a single node's prediction.
+        checks for an existing result in the cache first.
+        :param node:
+        :param X:
+        :return:
+        """
+        md5 = Layer._generate_hash(node, self.X_trn, X)
+        fname = '{}/{}.npz'.format(PREDICTIONS_DIR, md5)
+        if fname in glob('{}/*.npz'):
+            return np.load(fname)
+        else:
+            self._fit_one(node)
+            preds = node.transform(X)
+            np.save(fname, preds)
+            return preds
+
+    def _predict_all(self, X):
+        """
+        predict helper function
+        :param X:
+        :return:
+        """
+        for node in self.nodes:
+            yield self._predict_one(node, X)
+
+    def predict(self, X):
+        return np.hstack([pred for pred in self._predict_all(X)])
+
+    transform = predict
 
     def make_union(self):
         """creates a sklean.FeatureUnion object from the models in this layer"""

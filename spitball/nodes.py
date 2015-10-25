@@ -2,6 +2,7 @@
 #from abc import ABCMeta, abstractmethod
 import numpy as np
 import arrow
+import hashlib
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor
 #from typing import Callable
@@ -20,7 +21,7 @@ class Node(TransformerMixin, BaseEstimator):
     Warning: Do not use this class directly. Use derived classes instead.
     """
 
-    def __init__(self, estimator, name=None, # todo: have nodes contain core/wrapped object?
+    def __init__(self, estimator, name=None, # todo: have nodes contain core/wrapped/base object?
                  target_transform=(lambda x: x),
                  inverse_transform=(lambda x: x),
                  baggs = 0):
@@ -46,16 +47,19 @@ class Node(TransformerMixin, BaseEstimator):
         self.inverse_transform = np.vectorize(inverse_transform)
         self.baggs = baggs
         self.predictions = []
+        self.is_fit = False
 
     def fit(self, X: np.ndarray, y: np.array):
         print('[{}] Training {}...'.format(arrow.utcnow().to('EST').format('HH:mm:ss'), self.name))
         self.estimator.fit(X, self.target_transform(y))
+        self.is_fit = True
         return self
 
     def predict(self, X: np.ndarray, y: np.array=None):
         #print('[{}] Predicting {}...'.format(arrow.utcnow().to('EST').format('HH:mm:ss'), self.name))
         pred = self.estimator.predict(X)
         return self.inverse_transform(pred)
+
 
     def transform(self, X, y=None):
         transformed = self.predict(X).reshape(-1, 1)

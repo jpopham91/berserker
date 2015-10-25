@@ -106,7 +106,7 @@ class Blender(object):
         self.base_models.add(model)
 
     def _fit(self):
-        for model in self.base_models.models:
+        for model in self.base_models.nodes:
             model.fit(self.X_trn, self.y_trn)
             self.val_preds.append(model.transform(self.X_val))
         self.meta_estimator.fit(np.hstack(self.val_preds), self.y_val)
@@ -118,7 +118,7 @@ class Blender(object):
             self._fit()
 
         preds = []
-        for model in self.base_models.models:
+        for model in self.base_models.nodes:
             preds.append(model.transform(X))
 
         return self.meta_estimator.predict(np.hstack(preds))
@@ -130,7 +130,7 @@ class Blender(object):
     # maybe break into get_scores and report?
     def report(self, sort=False):
         val_scores = []
-        for model in self.base_models.models:
+        for model in self.base_models.nodes:
             if hasattr(model, 'estimator'):
                 val_scores.append((model.name,
                                    model.score(self.X_trn, self.y_trn, self.metric),
