@@ -1,13 +1,13 @@
-# Spitball
+# ᛒΣᚱᛊΣᚱᛕΣᚱ
 ## A Simple Model Ensembling Framework
 
-Spitball is a python module used for streamlining the creation of complex machine learning ensembles.  Standing on the shoulders of scikit-learn, spitball allows multiple estimators to easily be combined into a single model that is more powerful than its constituents. If your top priority is predictive accuracy, spitball's simple api gives everything you need to quickly build a powerful black-box model that will easily outperform more traditional approaches. You don't need statistical rigor or sound methodology - you have results.
+Berserker is a python module used for streamlining the creation of complex machine learning ensembles.  Standing on the shoulders of scikit-learn, berserker allows multiple estimators to easily be combined into a single model that is more powerful than its constituents. If your top priority is predictive accuracy, berserker's simple api gives everything you need to quickly build a powerful black-box model that will easily outperform more traditional approaches. You don't need statistical rigor or sound methodology - you have results.
 
 *This module is very much in active development. While exciting new features will be added, extensive refactoring and breaking changes are basically inevitable.*
 
 ## Key components
 
- - __Node:__ The fundemental unit in spitball ensembles, nodes are containers that adds extra functionality to your estimator. Their killer feature is allowing predictors to mimic transformers so that they can be chained together.  Nodes feature more advanced configurability than vanilla sklearn models, allowing transformations, scaling, bagging, etc. to be specified as unique hyperparameters for every estimator.
+ - __Node:__ The fundemental unit in berserker ensembles, nodes are containers that adds extra functionality to your estimator. Their killer feature is allowing predictors to mimic transformers so that they can be chained together.  Nodes feature more advanced configurability than vanilla sklearn models, allowing transformations, scaling, bagging, etc. to be specified as unique hyperparameters for every estimator.
  
  - __Meta-Estimators:__ This is the component that forms a final prediction.  It is trained on the predictions of other estimators. Any estimator may currently be used as the meta-estimator, and specialized algorithms like voters, feature-weighted stackers, and greedy stepwise regressors will be added shortly.
  
@@ -21,8 +21,8 @@ Spitball is a python module used for streamlining the creation of complex machin
 
 ###Incredibly simple regression model blending:
 ```python
-from spitball.ensemble import Blender
-from spitball.models import Node, Via
+from berserker.ensemble import Blender
+from berserker.models import Node, Via
 
 blender = Blender(X, y, mean_squared_error)
 

@@ -1,4 +1,4 @@
-from spitball.layers import Layer
+from berserker.layers import Layer
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.pipeline import make_pipeline, make_union
 import numpy as np
@@ -20,18 +20,25 @@ class Ensemble(object):
         self.y_val = y[-cutoff:]
 
         self.metric = metric
-        self.layers = []
-        self.pipe = None
+        self.layers = [Layer(self.X_trn, self.y_trn)]
 
-    # todo: add handling for single node layer (i.e. final meta-estimator)
-    def add(self, layer):
-        self.layers.append(layer)
+    def add_node(self, node):
+        self.layers[-1].add(node)
+
+    def add_layer(self, **kwargs):
+        self.layers.append(Layer(self.X_trn, self.y_trn, **kwargs))
 
     def predict(self, X):
-        steps = [layer.make_union() for layer in self.layers]
-        self.pipe = make_pipeline(*steps)
-        self.pipe.fit(self.X_trn, self.y_trn)
-        return self.pipe.predict(X)
+        preds = self.layers[0].transform(X)
+        val_preds = self.layers[0].transform(self.X_val)
+        if len(self.layers) == 0:
+            return preds
+        for layer in self.layers[1:]:
+            layer.X_trn = val_preds
+            layer.y_trn = self.y_val
+            print(val_preds.shape, self.y_val.shape)
+            preds = layer.transform(preds)
+        return preds
 
     def score(self, X, y):
         return self.metric(self.pipe.predict(X), y)
@@ -93,7 +100,7 @@ class Blender(object):
         self.is_fit = False
         self.meta_estimator = meta_estimator
         self.metric = metric
-        self.base_models = Layer()
+        self.base_models = Layer(self.X_trn, self.y_trn)
         self.pipe = None
 
     # todo: add handling for single node layer (i.e. final meta-estimator)

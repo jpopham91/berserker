@@ -5,6 +5,7 @@ import arrow
 import hashlib
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor
+import dis, sys, io
 #from typing import Callable
 
 # todo: find elegant way of enabling typing for pre python 3.5 setups
@@ -12,6 +13,16 @@ from sklearn.ensemble import BaggingClassifier, BaggingRegressor
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
+def _get_bytecode(func):
+    tmp = sys.stdout
+    stream = io.StringIO()
+    sys.stdout = stream
+    dis.dis(func)
+    sys.stdout = tmp
+    return stream.getvalue()
+
 
 # not an sklearn estimator, but a transformer
 class Node(TransformerMixin, BaseEstimator):
@@ -49,14 +60,21 @@ class Node(TransformerMixin, BaseEstimator):
         self.predictions = []
         self.is_fit = False
 
+    def _fingerprint(self):
+        return str([self.estimator,
+                    _get_bytecode(self.target_transform),
+                    _get_bytecode(self.inverse_transform)]).encode('ascii')
+
     def fit(self, X: np.ndarray, y: np.array):
         print('[{}] Training {}...'.format(arrow.utcnow().to('EST').format('HH:mm:ss'), self.name))
+        print(X.shape, y.shape)
         self.estimator.fit(X, self.target_transform(y))
         self.is_fit = True
         return self
 
     def predict(self, X: np.ndarray, y: np.array=None):
-        #print('[{}] Predicting {}...'.format(arrow.utcnow().to('EST').format('HH:mm:ss'), self.name))
+        print('[{}] Predicting {}...'.format(arrow.utcnow().to('EST').format('HH:mm:ss'), self.name))
+        print(X.shape)
         pred = self.estimator.predict(X)
         return self.inverse_transform(pred)
 

@@ -2,6 +2,7 @@
 *.swp
 *.csv
 *.tsv
+*.npy
 temp/*
 dist/*
 build/*

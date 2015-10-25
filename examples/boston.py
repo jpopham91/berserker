@@ -1,11 +1,37 @@
+from berserker.ensemble import Ensemble
+from berserker.layers import Layer
+from berserker.nodes import Node
 from sklearn.datasets import load_boston
-import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor, GradientBoostingRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
 data = load_boston().data
 n_samples = data.shape[0]
 test_split = int(0.2*n_samples)
-shuffled_data = data[np.random.permutation(n_samples)]
+np.random.seed(42)
+shuffled_data = data#[np.random.permutation(n_samples)]
 
 train = shuffled_data[:-test_split]
 test = shuffled_data[test_split:]
+
+X_trn = train[:, :-1]
+y_trn = train[:, -1]
+
+X_tst = train[:, :-1]
+y_tst = train[:, -1]
+
+model = Ensemble(X_trn, y_trn, mean_squared_error)
+
+model.add_node(LinearRegression())
+model.add_node(RandomForestRegressor())
+model.add_node(ExtraTreesRegressor())
+
+model.add_layer()
+model.add_node(LinearRegression())
+
+preds = model.predict(X_trn)
+print(mean_squared_error(y_tst, preds))
+
+
