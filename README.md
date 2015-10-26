@@ -1,13 +1,18 @@
-# Meet Berserker
+#Berserker
 <!---ᛒΣᚱᛊΣᚱᛕΣᚱ-->
 ## A Simple Model Ensembling Framework
 
 Berserker is a python module used for streamlining the creation of complex machine learning ensembles.  
 
-These aren't your dad's ensembles, if you want to train a random forest there are better tools for the job. If you want to take that random forest, combine it with 42 other models, and train another model on the output of those, all in an attempt to lower prediction error by a few percentage points - that's what berserker does best.
- 
- If you are concerned with such topics as "statistical rigor" and "sound methodology", close this tab and forget you ever came here. Make no mistake, any model built on this framework will be a black box.  It is a means to an end, and that end is making the most accurate predictions possible from your data.
+**These aren't your dad's ensembles.** 
 
+If you want to train a random forest there are better tools for the job. If you want to take that random forest, combine it with 42 other models, and train another model on the output of those, all in an attempt to lower prediction error by a few percentage points - that's what berserker does best.
+ 
+ If you are concerned with such topics as *"statistical rigor"* and *"sound methodology"*, close this tab and forget you ever came here. 
+ 
+ Make no mistake, any model built on this framework will be a black box.  It is a means to an end, and that end is making the most accurate predictions possible from your data.
+
+---
 *This module is very much in active development. While exciting new features will be added, extensive refactoring and breaking changes are basically inevitable.*
 
 ## Features
@@ -29,9 +34,6 @@ These aren't your dad's ensembles, if you want to train a random forest there ar
  - __Ensemble:__ A generic model containing a sequence of layers.  Ensembles are initialized with a labeled training dataset, and some performance metric to optimize. A single 'predict' call orchestrates transformations and movement of data between the ensemble's components to report its performance and produce an estimation. Ensembles will typically at least two layers:
     - A pool of base estimators which make initial predictions based on the training data.
     - A meta-estimator to find an the optimal weights for each prediction from the previous layer.
-<!---
- - __Meta-Estimators:__ This is the component that forms a final prediction.  It is trained on the predictions of other estimators. Any estimator may currently be used as the meta-estimator, and specialized algorithms like voters, feature-weighted stackers, and greedy stepwise regressors will be added shortly.
- -->
  
 ## Example
 Below is a few toy examples using the Boston housing prices dataset.
