@@ -6,7 +6,7 @@ Berserker is a python module used for streamlining the creation of complex machi
 
 **These aren't your dad's ensembles.** 
 
-If you want to train a random forest there are better tools for the job. If you want to take that random forest, combine it with 42 other models, and train another model on the output of those, all in an attempt to lower prediction error by a few percentage points - that's what berserker does best.
+If you want to train a random forest there are better tools for the job. If you want to take that random forest, combine it with 42 other models, and train another model on the output of those, all in an attempt to lower prediction error by some tiny fraction - that's what berserker does best.
  
  If you are concerned with such topics as *"statistical rigor"* and *"sound methodology"*, close this tab and forget you ever came here. 
  
