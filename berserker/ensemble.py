@@ -20,35 +20,44 @@ class Ensemble(object):
         #self.y_val = y[-cutoff:]
 
         self.metric = metric
-        self.layers = [Layer(self.X_trn, self.y_trn)]
+        self.layers = []
 
-    def add_node(self, node):
-        self.layers[-1].add(node)
+    def add_node(self, node, **kwargs):
+        self.layers[-1].add(node, **kwargs)
+        return self
+
+    def add_meta_estimator(self, node, **kwargs):
+        self.add_layer(folds=1)
+        self.add_node(node, **kwargs)
+        return self
 
     def add_layer(self, **kwargs):
         self.layers.append(Layer(self.X_trn, self.y_trn, **kwargs))
+        return self
 
     def predict(self, X):
+        self.layers[0].X_trn = self.layers[0].X_val = self.X_trn
         preds, val_preds = self.layers[0].transform(X)
-        #print(preds.shape, val_preds.shape)
         if len(self.layers) == 0:
             return preds
         for layer in self.layers[1:]:
             layer.X_trn = layer.X_val = val_preds
-            #print(layer.X_trn.shape)
             #layer.y_trn = self.y_val
             preds, val_preds = layer.transform(preds)
-            #print(preds.shape, val_preds.shape)
         return preds
 
-    def scores(self):
+    def scores(self, X, y):
+        scr_preds = self.predict(X)
         for n, layer in enumerate(self.layers):
             #print('\nLayer', n+1)
-            print('{: <24}  {: <6}'.format('\nLevel {:d} Estimators'.format(n+1),  'Val Score'))
-            print('-'*35)
+            print('{: <36}  {: <16}'.format('\nLevel {:d} Estimators ({} features)'.format(n+1, layer.X_trn.shape[1]),  'Validation Score'))
+            print('-'*53)
             for node, pred in zip(layer.nodes, layer.val_preds):
-                print('{: <24}  {:.4f}'.format(node.name, self.metric(layer.y_val, pred)))
-                #print(node.name, self.metric(layer.y_val, pred))
+                print('{: <36}  {:.4f}'.format(node.name, self.metric(layer.y_val, pred)))
+
+        print('{: <36}  {: <16}'.format('\nFull Ensemble'.format(n+1),  'Holdout Score'))
+        print('-'*53)
+        print('\033[1m{: <36}  {:.4f}\033[0m'.format('', self.metric(y, scr_preds)))
 
     # todo: some of the string formatting here is ugly and may need to get factored out
     def report(self, sort=False):

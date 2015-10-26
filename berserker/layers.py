@@ -5,7 +5,7 @@ from sklearn.cross_validation import KFold
 from sklearn.base import BaseEstimator, RegressorMixin, ClassifierMixin
 from sklearn.pipeline import make_union
 from glob import glob
-import hashlib
+from hashlib import md5
 import os
 
 
@@ -20,12 +20,7 @@ def generate_hash(node, X_trn, X_prd):
     train_data_hash = X_trn.data.tobytes()
     test_data_hash = X_prd.data.tobytes()
 
-    md5 = hashlib.md5()
-    md5.update(model_hash)
-    md5.update(train_data_hash)
-    md5.update(test_data_hash)
-
-    return md5.hexdigest()
+    return md5(model_hash).hexdigest() + md5(train_data_hash).hexdigest() + md5(test_data_hash).hexdigest()
 
 def check_cache(node, X_trn, X_prd):
     """
@@ -47,7 +42,7 @@ def check_cache(node, X_trn, X_prd):
 
 class Layer(object):
 
-    def __init__(self, X, y, folds=3, validation_split=None, validation_set=None):
+    def __init__(self, X, y, folds=1, validation_split=None, validation_set=None, pass_features=False):
         """
         :param X:
         :param y:
@@ -79,13 +74,14 @@ class Layer(object):
         self.trn_preds = []
         self.val_preds = []
         self.folds = folds
+        self.pass_features = pass_features
 
-    def add(self, thing):
+    def add(self, thing, **kwargs):
         """appends a node to the current layer"""
         if isinstance(thing, Node):
             self.nodes.append(thing)
         elif isinstance(thing, BaseEstimator):
-            self.nodes.append(Node(thing))
+            self.nodes.append(Node(thing, **kwargs))
         else:
             print('Warning, unfamiliar type: {}'.format(type(thing)))
 
@@ -180,6 +176,11 @@ class Layer(object):
     def predict(self, X):
         all_preds = [pred for pred in self._predict_all(X)]
         #print(all_preds)
-        return np.hstack(all_preds), np.hstack(self.val_preds)
+        if self.pass_features:
+            print(np.hstack(all_preds).shape, X.shape)
+            print(np.hstack(self.val_preds).shape, self.X_val.shape)
+            return np.hstack([np.hstack(all_preds), X]), np.hstack([np.hstack(self.val_preds), self.X_val])
+        else:
+            return np.hstack(all_preds), np.hstack(self.val_preds)
 
     transform = predict

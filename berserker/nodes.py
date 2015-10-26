@@ -5,6 +5,7 @@ import arrow
 import hashlib
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor
+from sklearn.preprocessing import scale
 import dis, sys, io
 #from typing import Callable
 
@@ -33,9 +34,11 @@ class Node(TransformerMixin, BaseEstimator):
     """
 
     def __init__(self, estimator, name=None, # todo: have nodes contain core/wrapped/base object?
+                 suffix = '',
                  target_transform=(lambda x: x),
                  inverse_transform=(lambda x: x),
-                 baggs = 0):
+                 baggs = 0,
+                 scale_x = False):
         """
         :param estimator: classifier or regressor compatible with the scikit-learn api
         :type estimator: sklearn estimator
@@ -46,9 +49,12 @@ class Node(TransformerMixin, BaseEstimator):
         :return:
         """
 
-        self.name = '{}'.format(str(estimator).split('(')[0])
         if name:
-            self.name += ' {}'.format(name)
+            self.name = name
+        else:
+            self.name = str(estimator).split('(')[0]
+
+        self.name = '{} {}'.format(self.name, suffix)
 
         if baggs:
             self.estimator = BaggingRegressor(estimator, baggs)
@@ -59,20 +65,25 @@ class Node(TransformerMixin, BaseEstimator):
         self.baggs = baggs
         self.predictions = []
         self.is_fit = False
+        self.scale_x = scale_x
 
     def _fingerprint(self):
-        return str([self.estimator,
+        return str([self.estimator, self.scale_x,
                     _get_bytecode(self.target_transform),
                     _get_bytecode(self.inverse_transform)]).encode('ascii')
 
     def fit(self, X: np.ndarray, y: np.array):
         print('[{}] Training {}...'.format(arrow.utcnow().to('EST').format('HH:mm:ss'), self.name))
+        if self.scale_x:
+            X = scale(X)
         self.estimator.fit(X, self.target_transform(y))
         self.is_fit = True
         return self
 
     def predict(self, X: np.ndarray, y: np.array=None):
         print('[{}] Predicting {}...'.format(arrow.utcnow().to('EST').format('HH:mm:ss'), self.name))
+        if self.scale_x:
+            X = scale(X)
         pred = self.estimator.predict(X)
         return self.inverse_transform(pred)
 
