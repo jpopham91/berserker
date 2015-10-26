@@ -1,14 +1,10 @@
-#Berserker
+#Yo dawg,
 <!---ᛒΣᚱᛊΣᚱᛕΣᚱ-->
-## A Simple Model Ensembling Framework
+## I herd you like ensembles, so we put ensembles in your ensembles so you can predict on your predictions
 
-Berserker is a python module used for streamlining the creation of complex machine learning ensembles.  
+**Berserker** is a python module used for streamlining the creation of complex machine learning ensembles.  These aren't your dad's ensembles, they're the entire damn orchestra.  Ever wondered what would happen if you combined 100 different regression models into a single super-estimator?  Because now's your chance to find out.  Berserker provides you with the duct tape and glue needed to stack and blend your way to the most frightening(ly effective) predictive models imaginable.
 
-If you are concerned with such topics as *"statistical rigor"* and *"sound methodology"*, close this tab and forget you ever came here. 
-
-These aren't your dad's ensembles. If you want to train a random forest there are better tools for the job. If you want to take that random forest, combine it with 42 other models, and train another model on the output because none of them were good enough individually - that's what berserker does best.
- 
- Make no mistake, any model built on this framework will be a black box.  It is a means to an end, and that end is making the most accurate predictions possible from your data.
+**Warning: If you are concerned with such topics as *"statistical rigor"* and *"sound methodology"*, you may find the content herein disturbing. Proceed with caution. You have been warned.**
 
 ---
 *This module is very much in active development. While exciting new features will be added, extensive refactoring and breaking changes are basically inevitable.*
