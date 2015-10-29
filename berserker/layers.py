@@ -1,44 +1,11 @@
-from berserker import PREDICTIONS_DIR
-from berserker.nodes import Node
 import numpy as np
 from sklearn.cross_validation import KFold
-from sklearn.base import BaseEstimator, RegressorMixin, ClassifierMixin
-from sklearn.pipeline import make_union
-from glob import glob
-from hashlib import md5
-import os
 
+from sklearn.base import BaseEstimator
 
-def generate_hash(node, X_trn, X_prd):
-    """
-    Generates the md5 hash for a given model, trained on X_trn, predicting X_prd.
-    Predictions can be stored using this hash in the filename,
-    so that repeat fitting, predictions can be avoided an improve speed.
-    """
-    # todo: make utils/io module
-    model_hash = node._fingerprint()
-    train_data_hash = X_trn.data.tobytes()
-    test_data_hash = X_prd.data.tobytes()
+from berserker.nodes import Node, check_cache
+from berserker.logger import log
 
-    return md5(model_hash).hexdigest() + md5(train_data_hash).hexdigest() + md5(test_data_hash).hexdigest()
-
-def check_cache(node, X_trn, X_prd):
-    """
-    checks model cache for existing prediction on this train-predict-node combo
-    :param node:
-    :param X:
-    :return:
-    """
-    # create directory if it doesn't exist
-    md5 = generate_hash(node, X_trn, X_prd)
-    if not os.path.exists(PREDICTIONS_DIR):
-        os.makedirs(PREDICTIONS_DIR)
-
-    fname = '{}/{}.npy'.format(PREDICTIONS_DIR, md5)
-    if fname in glob('{}/*.npy'.format(PREDICTIONS_DIR)):
-        return True, fname
-    else:
-        return False, fname
 
 class Layer(object):
 
@@ -83,7 +50,7 @@ class Layer(object):
         elif isinstance(thing, BaseEstimator):
             self.nodes.append(Node(thing, **kwargs))
         else:
-            print('Warning, unfamiliar type: {}'.format(type(thing)))
+            log.warning('Warning, unfamiliar type: {}'.format(type(thing)))
 
     def _fit_one(self, node, X=None, y=None, force=False):
         """

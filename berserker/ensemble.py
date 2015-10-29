@@ -46,8 +46,8 @@ class Ensemble(object):
             preds, val_preds = layer.transform(preds)
         return preds
 
-    def scores(self, X, y):
-        scr_preds = self.predict(X)
+    def scores(self, X, y=None):
+        preds = self.predict(X)
         for n, layer in enumerate(self.layers):
             #print('\nLayer', n+1)
             print('{: <36}  {: <16}'.format('\nLevel {:d} Estimators ({} features)'.format(n+1, layer.X_trn.shape[1]),  'Validation Score'))
@@ -55,9 +55,10 @@ class Ensemble(object):
             for node, pred in zip(layer.nodes, layer.val_preds):
                 print('{: <36}  {:.4f}'.format(node.name, self.metric(layer.y_val, pred)))
 
-        print('{: <36}  {: <16}'.format('\nFull Ensemble'.format(n+1),  'Holdout Score'))
-        print('-'*53)
-        print('\033[1m{: <36}  {:.4f}\033[0m'.format('', self.metric(y, scr_preds)))
+        #print('{: <36}  {: <16}'.format('\nFull Ensemble'.format(n+1),  'Holdout Score'))
+        #print('-'*53)
+        #print('\033[1m{: <36}  {:.4f}\033[0m'.format('', self.metric(y, scr_preds)))
+        return preds
 
     # todo: some of the string formatting here is ugly and may need to get factored out
     def report(self, sort=False):
