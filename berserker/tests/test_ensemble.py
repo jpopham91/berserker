@@ -31,14 +31,14 @@ class TestEnsembles(TestBase):
         self.ensemble.add_node(LinearRegression())
         self.ensemble.add_node(SVR())
         self.ensemble.add_meta_estimator(LinearRegression())
-        self.ensemble.predict(self.Xt)
+        self.ensemble._predict_all(self.Xt)
         Xt2 = np.random.rand(200).reshape((50, 4))
-        self.ensemble.predict(Xt2)
+        self.ensemble._predict_all(Xt2)
 
     def test_report(self):
         self.ensemble.add_layer(folds=5)
         self.ensemble.add_node(LinearRegression())
         self.ensemble.add_node(SVR())
         self.ensemble.add_meta_estimator(LinearRegression())
+        self.ensemble._predict_all(self.Xt)
         self.ensemble.predict(self.Xt)
-        self.ensemble.scores(self.Xt)

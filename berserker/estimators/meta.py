@@ -41,4 +41,4 @@ class FeatureWeightedEstimator(BaseEstimator):
     def predict(self, X, y_pred):
         assert X.shape[0] == y_pred.shape[0]
         Xy = self._combine_features(X, y_pred)
-        return self.estimator.predict(Xy)
+        return self.estimator._predict_all(Xy)

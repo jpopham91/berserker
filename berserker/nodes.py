@@ -122,6 +122,8 @@ class Node(TransformerMixin, BaseEstimator):
         self.predictions = []
         self.is_fit = False
         self.scale_x = scale_x
+        self.cached_preds = 0
+        self.total_preds = 0
 
     def __str__(self):
         return str([self.estimator, self.scale_x,
@@ -129,6 +131,7 @@ class Node(TransformerMixin, BaseEstimator):
                     _get_bytecode(self.inverse_transform)])
 
     def fit_predict(self, X_trn, y_trn, X_prd, refit=False):
+        self.total_preds += 1
         if self.scale_x:
             X_trn = scale(X_trn)
             X_prd = scale(X_prd)
@@ -137,6 +140,7 @@ class Node(TransformerMixin, BaseEstimator):
         exists, fname = check_cache(self, X_trn, X_prd)
         if exists:
             logging.info('{} re-using existing predictions'.format(self.name))
+            self.cached_preds += 1
             return np.load(fname)
 
         if not self.is_fit or refit:

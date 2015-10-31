@@ -31,7 +31,7 @@ class Ensemble(object):
         self.layers.append(Layer(self.X_trn, self.y_trn, **kwargs))
         return self
 
-    def predict(self, X):
+    def _predict_all(self, X):
         """recursively trace through each layer, using the previous layer's output as training data"""
         def _predict_layer(layers, X, new_data):
             head, *tail = layers
@@ -43,17 +43,25 @@ class Ensemble(object):
 
         return _predict_layer(self.layers, X, (self.X_trn, self.y_trn))
 
-    def scores(self, X, y=None):
+    def predict(self, X, y=None):
         start = time()
-        preds = self.predict(X)
+        preds = self._predict_all(X)
         elapsed = time() - start
-        print('\nElapsed time for {:d} models was {:.3g} seconds'.format(sum([layer.size() for layer in self.layers]), elapsed))
+
+        print('\n' + '='*53)
+        print('R E S U L T S'.center(53, '-'))
+        print('-'*53)
+        print('Elapsed time:                         {:.3g} seconds'.format(elapsed))
+        print('Total models in ensemble:             {:d}'.format(sum([layer.size() for layer in self.layers])))
+        print('Cached predictions used:              {:d} / {:d}'.format(sum([node.cached_preds for layer in self.layers for node in layer.nodes]),
+                                                             sum([node.total_preds for layer in self.layers for node in layer.nodes])))
+        print('-'*53)
         for n, layer in enumerate(self.layers):
             print('{: <36}  {: <16}'.format('\nLevel {:d} Estimators ({} features)'.format(n+1, layer.X_trn.shape[1]),  'Validation Score'))
             print('-'*53)
             for node, pred in zip(layer.nodes, layer.val_preds):
-                print('{: <36}  {:.4f}'.format(node.name, self.metric(layer.y_val, pred)))
-
+                print('{: <36}  {:.4g}'.format(node.name, self.metric(layer.y_val, pred)))
+        print('\n' + '='*53)
         #print('{: <36}  {: <16}'.format('\nFull Ensemble'.format(n+1),  'Holdout Score'))
         #print('-'*53)
         #print('\033[1m{: <36}  {:.4f}\033[0m'.format('', self.metric(y, scr_preds)))

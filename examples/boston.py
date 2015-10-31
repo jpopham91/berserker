@@ -37,11 +37,11 @@ model.add_node(GradientBoostingRegressor(n_estimators=250), name='Gradient Boost
 model.add_node(SVR('linear'), name='Linear SVR', scale_x=False)
 #model.add_node(SVR(), name='RBF SVR', scale_x=True)
 
-model.add_layer(folds=1)
+model.add_layer(folds=2)
 model.add_node(LinearRegression(), name='Lin Reg Meta Estimator')
 
 #preds = model.predict(X_tst)
-preds = model.scores(X_tst, y_tst)
+preds = model.predict(X_tst, y_tst)
 print(mean_squared_error(y_tst, preds))
 
 

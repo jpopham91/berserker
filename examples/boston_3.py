@@ -36,15 +36,12 @@ for kernel in ['linear', 'rbf']:
     for c in [.1, 1, 10]:
         model.add_node(SVR(kernel, C=c), suffix='{} kernel, C={:.1f}'.format(kernel, c), scale_x=True)
 
-model.add_layer(folds=3, pass_features=True)
+model.add_layer(folds=3, pass_features=False)
 model.add_node(RandomForestRegressor(500), name='RF Meta Estimator')
 model.add_node(GradientBoostingRegressor(n_estimators=500), name='GBR Meta Estimator')
 model.add_node(LinearRegression(), name='Lin Reg Meta Estimator')
 
-model.add_layer(folds=1)
+model.add_layer(folds=3)
 model.add_node(LinearRegression(), name='Lin Reg Meta Estimator')
 
-model.scores(X_tst, y_tst)
-
-
-
+model.predict(X_tst, y_tst)
