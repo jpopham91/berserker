@@ -2,6 +2,7 @@ from berserker.layers import Layer
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.pipeline import make_pipeline, make_union
 import numpy as np
+from time import time
 from fn import _
 
 class Ensemble(object):
@@ -42,11 +43,12 @@ class Ensemble(object):
 
         return _predict_layer(self.layers, X, (self.X_trn, self.y_trn))
 
-
     def scores(self, X, y=None):
+        start = time()
         preds = self.predict(X)
+        elapsed = time() - start
+        print('\nElapsed time for {:d} models was {:.3g} seconds'.format(sum([layer.size() for layer in self.layers]), elapsed))
         for n, layer in enumerate(self.layers):
-            #print('\nLayer', n+1)
             print('{: <36}  {: <16}'.format('\nLevel {:d} Estimators ({} features)'.format(n+1, layer.X_trn.shape[1]),  'Validation Score'))
             print('-'*53)
             for node, pred in zip(layer.nodes, layer.val_preds):
@@ -57,22 +59,6 @@ class Ensemble(object):
         #print('\033[1m{: <36}  {:.4f}\033[0m'.format('', self.metric(y, scr_preds)))
         return preds
 
-    # todo: some of the string formatting here is ugly and may need to get factored out
-    def report(self, sort=False):
-        val_scores = []
-        for model in self.layers[0].models:
-            if hasattr(model, 'estimator'):
-                val_scores.append((str(model.estimator).split('(')[0],
-                                   model.score(self.X_trn, self.y_trn, self.metric),
-                                   model.score(self.X_val, self.y_val, self.metric)))
-
-        if sort: val_scores = sorted(val_scores, key=lambda x: x[2])
-        width = max(map(lambda x: len(x[0]), val_scores))
-        print('\n{: <{w}}  {: <6}  {: <6}'.format('Model', 'Train', 'Val', w=width))
-        print('-'*(width+16))
-        for score in val_scores:
-            print('{: <{w}}  {:.4f}  {:.4f}'.format(*score, w=width))
-        print('\033[1m{: <{w}}  {:.4f}  {:.4f}\033[0m'.format('Full Ensemble', self.score(self.X_trn, self.y_trn), self.score(self.X_val, self.y_val), w=width))
 
 class Stacker(Ensemble):
     """
@@ -88,6 +74,7 @@ class Stacker(Ensemble):
 
     def __init__(self):
         super.__init__(self)
+
 
 # began as a cut an paste of ensemble
 class Blender(object):

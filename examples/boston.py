@@ -41,7 +41,7 @@ model.add_layer(folds=1)
 model.add_node(LinearRegression(), name='Lin Reg Meta Estimator')
 
 #preds = model.predict(X_tst)
-model.scores(X_tst, y_tst)
-
+preds = model.scores(X_tst, y_tst)
+print(mean_squared_error(y_tst, preds))
 
 
