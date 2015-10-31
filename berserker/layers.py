@@ -148,13 +148,10 @@ class Layer(object):
         if new_data:
             self._calculate_inputs(*new_data)
         self.val_preds = []
-        all_preds = [pred for pred in self._predict_all(X)]
-
+        all_preds = np.hstack([pred for pred in self._predict_all(X)])
+        val_preds = np.hstack(self.val_preds)
         # optionally add the input data to our predictions
         if self.pass_features:
             all_preds = np.hstack([all_preds, X])
-            self.val_preds = np.hstack([self.val_preds, self.X_val])
-        else:
-            return np.hstack(all_preds), (np.hstack(self.val_preds), self.y_val)
-
-    transform = predict
+            val_preds = np.hstack([val_preds, self.X_val])
+        return all_preds, (val_preds, self.y_val)
