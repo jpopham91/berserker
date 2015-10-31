@@ -10,14 +10,9 @@ class Ensemble(object):
     contains N layers, where layers 0..N-1 are collections of models and transformations
     and the Nth layer is a single (meta)estimator for making final predictions
     """
-    def __init__(self, X, y, metric, validation_split=0.2):
-        cutoff = int(len(X)*validation_split)
-        self.X_trn = X#[:-cutoff]
-        self.y_trn = y#[:-cutoff]
-
-        # todo: look into how keras deals with the existence of validation data
-        #self.X_val = X[-cutoff:]
-        #self.y_val = y[-cutoff:]
+    def __init__(self, X, y, metric):
+        self.X_trn = X
+        self.y_trn = y
 
         self.metric = metric
         self.layers = []
@@ -36,15 +31,17 @@ class Ensemble(object):
         return self
 
     def predict(self, X):
-        self.layers[0].X_trn = self.layers[0].X_val = self.X_trn
-        preds, val_preds = self.layers[0].transform(X)
-        if len(self.layers) == 0:
-            return preds
-        for layer in self.layers[1:]:
-            layer.X_trn = layer.X_val = val_preds
-            #layer.y_trn = self.y_val
-            preds, val_preds = layer.transform(preds)
-        return preds
+        """recursively trace through each layer, using the previous layer's output as training data"""
+        def _predict_layer(layers, X, new_data):
+            head, *tail = layers
+            preds, val_data = head.predict(X, new_data)
+            if not tail:
+                return preds
+            else:
+                return _predict_layer(tail, preds, val_data)
+
+        return _predict_layer(self.layers, X, (self.X_trn, self.y_trn))
+
 
     def scores(self, X, y=None):
         preds = self.predict(X)

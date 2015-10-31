@@ -156,15 +156,12 @@ class Node(TransformerMixin, BaseEstimator):
 
     def predict(self, X: np.ndarray, y: np.array=None):
         if not self.is_fit:
-            raise AttributeError('This model has not been fit. Use fit_predict instead.')
-        print('predicting')
+            raise AttributeError('Model has not been fit. Don\'t call predict directly. Use fit_predict instead.')
         logging.info('Predicting {}...'.format(self.name))
-        pred = self.estimator.predict(X)
-        return self.inverse_transform(pred)
-
-    def transform(self, X, y=None):
-        transformed = self.predict(X).reshape(-1, 1)
-        return transformed
+        # todo: needs handling for classifiers / proba
+        pred = self.inverse_transform(self.estimator.predict(X))\
+                   .reshape(X.shape[0], -1)
+        return pred
 
     def score(self, X, y, metric):
         return metric(y, self.predict(X))

@@ -76,19 +76,18 @@ class TestNodes(TestBase):
         self.assert_nodes_equal(Node(LogisticRegression('l1', C=5)),
                                 Node(LogisticRegression(C=5, penalty='l1')))
 
-    def test_predict_shape(self):
+    def test_reg_predict_shape(self):
         X = np.random.rand(100).reshape((25, 4))
         Xt = np.random.rand(200).reshape((-1, 4))
         y = np.random.rand(25)
         preds = self.n3.fit_predict(X, y, Xt)
-        self.assertEqual(preds.shape, (len(Xt),))
+        self.assertEqual(preds.shape, (len(Xt), 1))
 
-    def test_transform_shape(self):
+    def test_clf_predict_shape(self):
         X = np.random.rand(100).reshape((25, 4))
         Xt = np.random.rand(200).reshape((-1, 4))
         y = np.random.rand(25)
-        self.n3.fit_predict(X, y, Xt)
-        preds = self.n3.transform(Xt)
+        preds = self.n1.fit_predict(X, y, Xt)
         self.assertEqual(preds.shape, (len(Xt), 1))
 
     def test_saving(self):
