@@ -14,8 +14,6 @@ test_split = int(0.2*n_samples)
 np.random.seed(42)
 shuffled_data = data[np.random.permutation(n_samples)]
 
-#print(data)
-
 train = shuffled_data[:-test_split]
 test = shuffled_data[-test_split:]
 X_trn = train[:, :-1]
@@ -36,12 +34,12 @@ for kernel in ['linear', 'rbf']:
     for c in [.1, 1, 10]:
         model.add_node(SVR(kernel, C=c), suffix='{} kernel, C={:.1f}'.format(kernel, c), scale_x=True)
 
-model.add_layer(folds=3, pass_features=False)
+model.add_layer(folds=4, pass_features=False)
 model.add_node(RandomForestRegressor(500), name='RF Meta Estimator')
 model.add_node(GradientBoostingRegressor(n_estimators=500), name='GBR Meta Estimator')
 model.add_node(LinearRegression(), name='Lin Reg Meta Estimator')
 
-model.add_layer(folds=3)
+model.add_layer(folds=5)
 model.add_node(LinearRegression(), name='Lin Reg Meta Estimator')
 
 model.predict(X_tst, y_tst)
