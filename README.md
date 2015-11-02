@@ -1,6 +1,6 @@
 # Berserker
 <!---ᛒΣᚱᛊΣᚱᛕΣᚱ-->
-## Ensembles for your ensembles so you can predict on your predictions ![blah](http://s3-ak.buzzfeed.com/static/user_images/web02/2010/9/3/10/xzibit-13834-1283523581-22_large.jpg "yodawg")
+## Ensembles for your ensembles so you can predict on your predictions ![blah](http://www.gtaforum.cz/images/smilies/yodawgb.png "yodawg")
 
 **Berserker** is a python module used for streamlining the creation of complex machine learning ensembles.  These aren't your dad's ensembles, they're the entire damn orchestra.  Ever wondered what would happen if you combined 100 different regression models into a single super-estimator?  Because now's your chance to find out.  Berserker provides you with the duct tape and glue needed to stack and blend your way to the most frightening(ly effective) predictive models imaginable.
 

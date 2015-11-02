@@ -9,13 +9,13 @@ import hashlib
 
 import numpy as np
 import arrow
+import sklearn
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import BaggingRegressor
-from sklearn.preprocessing import scale
-
-#from typing import Callable
+from sklearn.preprocessing import scale, StandardScaler
 
 # todo: find elegant way of enabling typing for pre python 3.5 setups
+#from typing import Callable
 #from mypy.types import CallableType as Callable
 
 import warnings
@@ -25,6 +25,7 @@ import logging
 #log = logging.getLogger()
 #logging.setLevel(logging.DEBUG)
 
+# todo: handle logging globally
 logging.basicConfig(format='[%(asctime)s] [%(levelname)8s] %(message)s',
                     level=logging.DEBUG,
                     datefmt='%I:%M:%S')
@@ -32,6 +33,8 @@ logging.basicConfig(format='[%(asctime)s] [%(levelname)8s] %(message)s',
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 def _get_bytecode(func):
+    # todo: this could use something like
+    # [(i.opname, i.argval) for i in dis.Bytecode(f)]
     tmp = sys.stdout
     stream = io.StringIO()
     sys.stdout = stream
@@ -68,7 +71,8 @@ def generate_hash(node, X_trn, X_prd):
     Predictions can be stored using this hash in the filename,
     so that repeat fitting, predictions can be avoided an improve speed.
     """
-    # todo: make utils/io module
+    # todo: make utils/io module?
+    # todo: does this need to incorporate y_trn?
     md5 = hashlib.md5()
     model_hash = str(node).encode('utf')
     trn_hash = b'\x00' + X_trn.data.tobytes() + str(X_trn.shape).encode('utf')
@@ -90,11 +94,12 @@ class Node(TransformerMixin, BaseEstimator):
     """
 
     def __init__(self, estimator, name=None, # todo: have nodes contain core/wrapped/base object?
-                 suffix = '',
+                 tag = '',
                  target_transform=(lambda x: x),
                  inverse_transform=(lambda x: x),
                  baggs = 0,
-                 scale_x = False):
+                 scale_x = False,
+                 fillna=-1):
         """
         :param estimator: classifier or regressor compatible with the scikit-learn api
         :type estimator: sklearn estimator
@@ -110,10 +115,10 @@ class Node(TransformerMixin, BaseEstimator):
         else:
             self.name = str(estimator).split('(')[0]
 
-        self.name = '{} {}'.format(self.name, suffix)
+        self.name = '{} {}'.format(self.name, tag)
 
         if baggs:
-            self.estimator = BaggingRegressor(estimator, baggs)
+            self.estimator = sklearn.ensemble.BaggingRegressor(estimator, baggs)
         else:
             self.estimator = estimator
         self.target_transform = np.vectorize(target_transform)
@@ -122,6 +127,7 @@ class Node(TransformerMixin, BaseEstimator):
         self.predictions = []
         self.is_fit = False
         self.scale_x = scale_x
+        self.fillna = fillna
         self.cached_preds = 0
         self.total_preds = 0
 
@@ -132,10 +138,22 @@ class Node(TransformerMixin, BaseEstimator):
 
     def fit_predict(self, X_trn, y_trn, X_prd, refit=False):
         self.total_preds += 1
+
+        # arrays are mutable
+        X_trn = X_trn.copy()
+        X_prd = X_prd.copy()
+        y_trn = y_trn.copy()
+
+        if self.fillna is not None:
+            X_trn[np.isnan(X_trn)] = self.fillna
+            X_prd[np.isnan(X_prd)] = self.fillna
+
         if self.scale_x:
-            X_trn = scale(X_trn)
-            X_prd = scale(X_prd)
-        y_trn = self.inverse_transform(y_trn)
+            scl = StandardScaler()
+            #scl.fit(np.vstack([X_trn, X_prd]))
+            scl.fit(X_trn)
+            X_trn = scl.transform(X_trn)
+            X_prd = scl.transform(X_prd)
 
         exists, fname = check_cache(self, X_trn, X_prd)
         if exists:
@@ -144,31 +162,30 @@ class Node(TransformerMixin, BaseEstimator):
             return np.load(fname)
 
         if not self.is_fit or refit:
-            self.fit(X_trn, y_trn)
+            self._fit(X_trn, y_trn)
 
-        preds = self.predict(X_prd)
+        preds = self._predict(X_prd)
         np.save(fname, preds)
         return preds
 
-    def fit(self, X: np.ndarray, y: np.array):
+    def _fit(self, X: np.ndarray, y: np.array):
         logging.info('Training {}...'.format(self.name))
-        if self.scale_x:
-            X = scale(X)
-        self.estimator.fit(X, self.target_transform(y))
+        #if self.scale_x:
+        #    X = scale(X)
+        y_tfd = self.target_transform(y)
+        self.estimator.fit(X, y_tfd)
         self.is_fit = True
         return self
 
-    def predict(self, X: np.ndarray, y: np.array=None):
+    def _predict(self, X: np.ndarray, y: np.array=None):
         if not self.is_fit:
             raise AttributeError('Model has not been fit. Don\'t call predict directly. Use fit_predict instead.')
         logging.info('Predicting {}...'.format(self.name))
         # todo: needs handling for classifiers / proba
-        pred = self.inverse_transform(self.estimator.predict(X))\
-                   .reshape(X.shape[0], -1)
-        return pred
-
-    def score(self, X, y, metric):
-        return metric(y, self.predict(X))
+        pred = self.estimator.predict(X).reshape(X.shape[0], -1)
+        pred_tfd = self.target_transform(pred)
+        pred_itfd = self.inverse_transform(pred)
+        return pred_itfd
 
 
 class Model(Node):
