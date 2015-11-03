@@ -99,7 +99,8 @@ class Node(TransformerMixin, BaseEstimator):
                  inverse_transform=(lambda x: x),
                  baggs = 0,
                  scale_x = False,
-                 fillna=-1):
+                 fillna=-1,
+                 columns=np.s_[:]):
         """
         :param estimator: classifier or regressor compatible with the scikit-learn api
         :type estimator: sklearn estimator
@@ -128,6 +129,7 @@ class Node(TransformerMixin, BaseEstimator):
         self.is_fit = False
         self.scale_x = scale_x
         self.fillna = fillna
+        self.columns = columns
         self.cached_preds = 0
         self.total_preds = 0
 
@@ -140,8 +142,8 @@ class Node(TransformerMixin, BaseEstimator):
         self.total_preds += 1
 
         # arrays are mutable
-        X_trn = X_trn.copy()
-        X_prd = X_prd.copy()
+        X_trn = X_trn.copy()[:,self.columns]
+        X_prd = X_prd.copy()[:,self.columns]
         y_trn = y_trn.copy()
 
         if self.fillna is not None:
