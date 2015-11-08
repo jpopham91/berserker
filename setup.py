@@ -3,7 +3,7 @@ from distutils.core import setup, find_packages
 setup(
     name='berserker',
     version='0.1',
-    description='Model ensembling framework'
+    description='Model ensembling framework',
     packages=['berserker', 'berserker.estimators'],
     url='github.com/jpopham91/berserker',
     license='MIT',
