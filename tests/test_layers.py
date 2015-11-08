@@ -10,7 +10,7 @@ class TestBase(unittest.TestCase):
     def setUp(self):
         #np.random.seed(42)
         self.X = np.random.rand(100).reshape((25, 4))
-        self.Xt = np.random.rand(200).reshape((-1, 4))
+        self.Xt = np.random.rand(200).reshape((50, 4))
         self.y = np.random.rand(25)
         self.stack = Layer(self.X, self.y, folds=3)
         self.blend = Layer(self.X, self.y, validation_split=0.2)
@@ -55,7 +55,7 @@ class TestLayers(TestBase):
         blend = Layer(self.X, self.y, validation_split=0.2)
         blend.add(LinearRegression())
         blend.add(SVR())
-        preds, (X_val, y_val)  = blend.predict(self.Xt)
+        preds, (X_val, y_val) = blend.predict(self.Xt)
         self.assertEqual(X_val.shape[1], 2)
         self.assertEqual(preds.shape[0], self.Xt.shape[0])
         self.assertAlmostEqual(X_val.shape[0], self.X.shape[0]*0.2)
