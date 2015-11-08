@@ -5,6 +5,7 @@ python:
 # command to install dependencies
 install:
   - python setup.py install
+  - pip install numpy pandas scikit-learn
 # command to run tests
 script:
   - nosetests
