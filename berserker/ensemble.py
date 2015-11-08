@@ -4,7 +4,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.pipeline import make_pipeline, make_union
 import numpy as np
 from time import time, sleep
-from fn import _
+#from fn import _
 
 class Ensemble(object):
     """

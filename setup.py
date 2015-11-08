@@ -1,12 +1,13 @@
-from distutils.core import setup
+from distutils.core import setup, find_packages
 
 setup(
     name='berserker',
     version='0.1',
+    description='Model ensembling framework'
     packages=['berserker', 'berserker.estimators'],
-    url='',
-    license='',
-    author='jake',
-    author_email='',
-    description=''
+    url='github.com/jpopham91/berserker',
+    license='MIT',
+    author='Jake Popham',
+    author_email='jxp6414@gmail.com',
+    install_requires=['sklearn', 'numpy', 'pandas'],
 )
