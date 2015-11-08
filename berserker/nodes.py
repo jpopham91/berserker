@@ -95,8 +95,8 @@ class Node(TransformerMixin, BaseEstimator):
 
     def __init__(self, estimator, name=None, # todo: have nodes contain core/wrapped/base object?
                  tag = '',
-                 target_transform=(lambda x: x),
-                 inverse_transform=(lambda x: x),
+                 target_transform=lambda x: x,
+                 inverse_transform=lambda x: x,
                  baggs = 0,
                  scale_x = False,
                  fillna=-1,
@@ -240,5 +240,3 @@ class Transformer(Node):
     A node which can be used to transform (scale, decompose, vectorize, etc) feature vectors
     Does not have a predict method
     """
-
-

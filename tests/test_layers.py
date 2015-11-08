@@ -14,8 +14,8 @@ class TestBase(unittest.TestCase):
         self.y = np.random.rand(25)
         self.stack = Layer(self.X, self.y, folds=3)
         self.blend = Layer(self.X, self.y, validation_split=0.2)
+        self.stack_clf = Layer(self.X, (self.y+0.5).astype(int), folds=3)
         self.node = Node(LinearRegression())
-
 
 # todo refactor out base classes for stacks, blends
 class TestLayers(TestBase):
@@ -61,9 +61,9 @@ class TestLayers(TestBase):
         self.assertAlmostEqual(X_val.shape[0], self.X.shape[0]*0.2)
 
     def test_clf_pred_shape(self):
-        self.stack.add(LogisticRegression())
-        self.stack.add(SVC())
-        preds, (X_val, y_val)  = self.stack.predict(self.Xt)
+        self.stack_clf.add(LogisticRegression())
+        self.stack_clf.add(SVC())
+        preds, (X_val, y_val)  = self.stack_clf.predict(self.Xt)
         self.assertEqual(X_val.shape[1], 2)
         self.assertEqual(preds.shape[0], self.Xt.shape[0])
         self.assertEqual(X_val.shape[0], self.X.shape[0])

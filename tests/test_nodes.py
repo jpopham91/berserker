@@ -86,8 +86,9 @@ class TestNodes(TestBase):
     def test_clf_predict_shape(self):
         X = np.random.rand(100).reshape((25, 4))
         Xt = np.random.rand(200).reshape((-1, 4))
-        y = np.random.rand(25)
-        preds = self.n1.fit_predict(X, y, Xt)
+        y = (np.random.rand(25)+0.5).astype(int)
+        node = Node(LogisticRegression())
+        preds = node.fit_predict(X, y, Xt)
         self.assertEqual(preds.shape, (len(Xt), 1))
 
     def test_saving(self):
