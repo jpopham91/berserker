@@ -1,4 +1,4 @@
-from distutils.core import setup, find_packages
+from distutils.core import setup
 
 setup(
     name='berserker',
