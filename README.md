@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/jpopham91/berserker.svg?branch=develop)](https://travis-ci.org/jpopham91/berserker)
 # Berserker
 <!---ᛒΣᚱᛊΣᚱᛕΣᚱ-->
 ## Ensembles for your ensembles so you can predict on your predictions

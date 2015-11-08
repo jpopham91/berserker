@@ -15,7 +15,7 @@ before_install:
   - pip install -U pip
 
 install:
-  - travis_wait travis_retry pip install numpy scipy pandas scikit-learn arrow
+  - travis_wait travis_retry pip install numpy scipy==0.15 pandas scikit-learn arrow
   - travis_retry pip install python-coveralls
   - travis_retry python setup.py install
 
