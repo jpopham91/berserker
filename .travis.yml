@@ -20,7 +20,10 @@ install:
   - travis_retry python setup.py install
 
 script:
-  - nosetests
+  - nosetests --with-coverage --cover-package=berserker
+
+after_success:
+  - coveralls
 
 cache:
   - apt
