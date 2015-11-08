@@ -185,7 +185,6 @@ class Node(TransformerMixin, BaseEstimator):
         logging.info('Predicting {}...'.format(self.name))
         # todo: needs handling for classifiers / proba
         pred = self.estimator.predict(X).reshape(X.shape[0], -1)
-        pred_tfd = self.target_transform(pred)
         pred_itfd = self.inverse_transform(pred)
         return pred_itfd
 
@@ -241,22 +240,5 @@ class Transformer(Node):
     A node which can be used to transform (scale, decompose, vectorize, etc) feature vectors
     Does not have a predict method
     """
-
-
-# todo: might change the via to an estimator/tranformer to be wrapped in Transformer
-class Via(Node):
-    """A node which passes feature vectors through to the next layer unaltered"""
-
-    def __init__(self):
-        return
-
-    def fit(self, X, y):
-        return self
-
-    def predict(self, X, y=None):
-        return X
-
-    def transform(self, X, *args, **kwargs):
-        return X
 
 

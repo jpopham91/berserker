@@ -7,6 +7,17 @@ from berserker.nodes import Node, check_cache
 from berserker.logger import log
 
 
+def equal_inputs(a: np.array, b: np.array) -> bool:
+    """
+    Checks if ndarrays are equal. Inputs with different shapes return False, instead of an error.
+    :param a:
+    :param b:
+    :return:
+    """
+    if a.shape != b.shape:
+        return False
+    return np.allclose(a, b, equal_nan=True)
+
 class Layer(object):
 
     def __init__(self, X: np.ndarray, y: np.array, folds: int=1, validation_split: float=0.,
@@ -105,7 +116,7 @@ class Layer(object):
 
         # when using the same data for training and validation
         # train/val indices are determined via kfold
-        if np.array_equal(self.X_trn, self.X_val) and self.folds > 1:
+        if equal_inputs(self.X_trn, self.X_val) and self.folds > 1:
             fold_list = KFold(len(self.X_trn), self.folds)
         # otherwise a holdout validation set is used
         else:

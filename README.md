@@ -1,10 +1,8 @@
 # Berserker
 <!---ᛒΣᚱᛊΣᚱᛕΣᚱ-->
-## Ensembles for your ensembles so you can predict on your predictions ![blah](http://www.gtaforum.cz/images/smilies/yodawgb.png "yodawg")
+## Ensembles for your ensembles so you can predict on your predictions
 
-**Berserker** is a python module used for streamlining the creation of complex machine learning ensembles.  These aren't your dad's ensembles, they're the entire damn orchestra.  Ever wondered what would happen if you combined 100 different regression models into a single super-estimator?  Because now's your chance to find out.  Berserker provides you with the duct tape and glue needed to stack and blend your way to the most frightening(ly effective) predictive models imaginable.
-
-**Warning: If you are concerned with such topics as *"statistical rigor"* and *"sound methodology"*, you may find the content herein disturbing. Proceed with caution. You have been warned.**
+**Berserker** is a python module used for streamlining the creation of complex machine learning ensembles.  These aren't your dad's ensembles, they're the entire damn orchestra.  Ever wondered what would happen if you combined 100 different regression models into a single super-estimator?  Because now's your chance to find out.  Berserker provides you with the duct tape and glue needed to stack and blend your way to the most frightening(ly effective) predictive models imaginable. If you are concerned with such topics as *"statistical rigor"* and *"sound methodology"*, this is probably not for the tool for you.  Berserker is used to create "black box" models which maximize predictive accuracy at the expense of statistical clarity.
 
 ---
 *This module is very much in active development. While exciting new features will be added, extensive refactoring and breaking changes are basically inevitable.*
@@ -12,27 +10,28 @@
 ## Features
 
  - __Scikit-Learn Compatibility:__ Berserker nodes interact with their base estimators assuming a scikit-learn api, so there is no need to reinvent the wheel.  Any scikit-learn estimator or transformer can be added to a your ensemble, as well as models from many third party packages like xgboost and keras.
-  
+
  - __Intelligent Model Persistence:__ A unique 384-bit hash id is generated any time a node is asked to make a prediction which is used to cache the model's output to disk.  Berserker automatically checks the cache for the current model/train/test combination, so it won't waste time retraining a model it already has predictions for.
- 
+
  - __Everything is a Hyperparameter:__ Feature scaling, target data transformations, splits, and folds are now variables which can be optimized.  But rather than searching for the ideal combination, just feed everything into the model and most useful ones are automatically given the most weight.
- 
+
  - __Positively Pythonic:__ Berserker ensembles are constructed using a compact, human-readable syntax at the highest level of abstraction that is practical.  Rapid development would be an understatement - the most basic ensembles can be set up in about five lines of code, and nodes/layers can generated algorithmically.
 
 ## Key Components
 
  - __Node:__ The fundamental unit in berserker ensembles, nodes are containers that adds extra functionality to your estimator. Their killer feature is allowing predictors to mimic transformers so that they can be chained together.  Nodes feature more advanced configurability than vanilla sklearn models, allowing transformations, scaling, bagging, etc. to be specified as unique hyperparameters for every estimator.
- 
+
  - __Layer:__ A level of abstraction above the node is the layer.  Layers are collections of one or more nodes which share a common input (training and test data).  Layers inherit the same scikit-learn api is nodes, and their predict function combines the predictions of every node as columns in a matrix.  The predictions of one layer can be piped into another as training data.
- 
+
  - __Ensemble:__ A generic model containing a sequence of layers.  Ensembles are initialized with a labeled training dataset, and some performance metric to optimize. A single 'predict' call orchestrates transformations and movement of data between the ensemble's components to report its performance and produce an estimation. Ensembles will typically at least two layers:
     - A pool of base estimators which make initial predictions based on the training data.
     - A meta-estimator to find an the optimal weights for each prediction from the previous layer.
- 
+
 ## Example
 Below is a few toy examples using the Boston housing prices dataset.
 
 #### A bare-minimum stacking ensemble:
+
 ```python
 from berserker.ensemble import Ensemble
 from berserker.layers import Layer
