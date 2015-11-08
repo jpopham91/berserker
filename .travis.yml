@@ -1,17 +1,28 @@
 language: python
+
 python:
   - "3.4"
   - "3.5"
+
+addons:
+  apt:
+    packages:
+    - libblas-dev
+    - liblapack-dev
+    - gfortran
+
 before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b
-  - export PATH=/home/travis/miniconda/bin:$PATH
-  - conda update --yes conda
-# command to install dependencies
+  - pip install -U pip
+
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy pandas scikit-learn
-  - python setup.py install
-# command to run tests
+  - travis_wait travis_retry pip install -r requirements-dev.txt
+  - travis_retry pip install python-coveralls
+  - travis_retry python setup.py dev
+
 script:
   - nosetests
+
+cache:
+  - apt
+  - directories:
+    - $HOME/.cache/pip
