@@ -9,5 +9,5 @@ setup(
     license='MIT',
     author='Jake Popham',
     author_email='jxp6414@gmail.com',
-    install_requires=['sklearn', 'numpy', 'pandas'],
+    install_requires=['scikit-learn', 'numpy', 'pandas'],
 )
