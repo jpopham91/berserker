@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/jpopham91/berserker.svg?branch=develop)](https://travis-ci.org/jpopham91/berserker)
-# Berserker
-<!---ᛒΣᚱᛊΣᚱᛕΣᚱ-->
+[![Coverage Status](https://coveralls.io/repos/jpopham91/berserker/badge.svg?branch=develop&service=github)](https://coveralls.io/github/jpopham91/berserker?branch=develop)
+
+<img src=https://raw.githubusercontent.com/jpopham91/berserker/develop/assets/logo/berserker-runes.png width=400/>
+
 ## Ensembles for your ensembles so you can predict on your predictions
 
 **Berserker** is a python module used for streamlining the creation of complex machine learning ensembles.  These aren't your dad's ensembles, they're the entire damn orchestra.  Ever wondered what would happen if you combined 100 different regression models into a single super-estimator?  Because now's your chance to find out.  Berserker provides you with the duct tape and glue needed to stack and blend your way to the most frightening(ly effective) predictive models imaginable. If you are concerned with such topics as *"statistical rigor"* and *"sound methodology"*, this is probably not for the tool for you.  Berserker is used to create "black box" models which maximize predictive accuracy at the expense of statistical clarity.
