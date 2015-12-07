@@ -12,3 +12,4 @@ examples/_*
 spitball/estimators/*
 .idea/*
 *.egg-info
+*.coverage
