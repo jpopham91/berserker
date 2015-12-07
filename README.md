@@ -1,7 +1,8 @@
 [![Build Status](https://travis-ci.org/jpopham91/berserker.svg?branch=develop)](https://travis-ci.org/jpopham91/berserker)
 [![Coverage Status](https://coveralls.io/repos/jpopham91/berserker/badge.svg?branch=develop&service=github)](https://coveralls.io/github/jpopham91/berserker?branch=develop)
 
-<img src=https://raw.githubusercontent.com/jpopham91/berserker/develop/assets/logo/berserker-runes.png width=400/>
+<!---img src=https://raw.githubusercontent.com/jpopham91/berserker/develop/assets/logo/berserker-runes.png width=400/--->
+#Berkserker
 
 ## Ensembles for your ensembles so you can predict on your predictions
 
@@ -165,11 +166,12 @@ Level 3 Estimators (36 features)     Validation Score
 You can see that is very simple to churn out a massive amount of base estimators, and doing so will generally improve the ensembles performance.
 
 ## Todo
-- Tests
+- ~~Tests~~
+- ~~Coverage~~
 - Include more metaclassifiers
-- Prettier reports
-- Tests
+- ~~Prettier reports~~
 - Classification examples
-- Tests
-- Finish documentation, type hints
-- Tests
+- Finish documentation
+- 3.5 style type hints
+- Python 2 compatibility?
+- More Tests
