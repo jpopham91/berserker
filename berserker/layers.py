@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.cross_validation import KFold
 
 from sklearn.base import BaseEstimator
+from keras.wrappers.scikit_learn import BaseWrapper
 
 from berserker.nodes import Node, check_cache
 from berserker.logger import log
@@ -96,7 +97,7 @@ class Layer(object):
         # todo: might use the new @overload to separate add estimator vs add node
         if isinstance(thing, Node):
             self.nodes.append(thing)
-        elif isinstance(thing, BaseEstimator):
+        elif isinstance(thing, BaseEstimator) or isinstance(thing, BaseWrapper):
             self.nodes.append(Node(thing, **kwargs))
         else:
             log.warning('Warning, unfamiliar type: {}'.format(type(thing)))
