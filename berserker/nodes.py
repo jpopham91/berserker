@@ -99,7 +99,7 @@ class Node(TransformerMixin, BaseEstimator):
                  inverse_transform=lambda x: x,
                  baggs = 0,
                  scale_x = False,
-                 fillna=-1,
+                 fillna=None,
                  columns=np.s_[:]):
         """
         :param estimator: classifier or regressor compatible with the scikit-learn api
@@ -220,6 +220,14 @@ class Classifier(Model):
     """
     Standard node for predicting binary or categorical values.
     """
+    def _predict(self, X: np.ndarray, y: np.array=None):
+        if not self.is_fit:
+            raise AttributeError('Model has not been fit. Don\'t call predict directly. Use fit_predict instead.')
+        logging.info('Predicting {}...'.format(self.name))
+        # todo: needs handling for classifiers / proba
+        pred = self.estimator.predict_proba(X)[:,1]
+        pred_itfd = self.inverse_transform(pred).reshape(-1,1)
+        return pred_itfd
 
 
 class BaggingClassifier(Classifier):
