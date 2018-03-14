@@ -2,7 +2,7 @@
 [![Coverage Status](https://coveralls.io/repos/jpopham91/berserker/badge.svg?branch=develop&service=github)](https://coveralls.io/github/jpopham91/berserker?branch=develop)
 
 <!---img src=https://raw.githubusercontent.com/jpopham91/berserker/develop/assets/logo/berserker-runes.png width=400/--->
-#Berkserker
+# Berkserker
 
 ## Ensembles for your ensembles so you can predict on your predictions
 
